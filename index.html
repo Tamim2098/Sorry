@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Surprise For You - Oishy</title>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Great+Vibes&family=Pacifico&family=Satisfy&display=swap" rel="stylesheet">
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html, body {
+            width: 100%; height: 100%;
+            background-color: black;
+            color: white;
+            overflow: hidden;
+            font-family: 'Dancing Script', cursive;
+        }
+
+        canvas {
+            display: block;
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 1;
+        }
+
+        #text-container {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%) scale(0.5);
+            z-index: 2;
+            text-align: center;
+            width: 100%;
+            padding: 0 16px;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+        }
+
+        #text-container.show {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        #text-container.number-style .word-display {
+            font-family: 'Pacifico', cursive;
+            font-size: clamp(6rem, 30vw, 14rem);
+            color: #ff3385;
+            text-shadow: 0 0 10px #ff3385, 0 0 30px #ff3385, 0 0 70px #ff3385;
+            display: block;
+            line-height: 1;
+        }
+
+        #text-container.word-style .word-display {
+            font-family: 'Great Vibes', cursive;
+            font-size: clamp(5rem, 24vw, 12rem);
+            color: #ff3385;
+            text-shadow: 0 0 10px #ff3385, 0 0 30px #ff3385, 0 0 60px #ff3385;
+            display: block;
+            line-height: 1.1;
+        }
+
+        #stars {
+            display: none;
+            position: absolute;
+            inset: 0;
+            background: black;
+            z-index: 3;
+        }
+
+        #final-message {
+            display: none;
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 4;
+            text-align: center;
+            width: 92%;
+            max-width: 700px;
+            padding: 0 10px;
+            opacity: 0;
+            transition: opacity 2s ease-in;
+        }
+
+        .handwriting-gold {
+            font-family: 'Satisfy', cursive;
+            color: #fbd6b1;
+            font-size: clamp(1.6rem, 6vw, 3rem);
+            margin: 0 0 8px 0;
+            font-weight: normal;
+            text-shadow: 0 0 15px rgba(251,214,177,0.4);
+        }
+
+        .glow-title {
+            font-family: 'Great Vibes', cursive;
+            font-size: clamp(4.5rem, 18vw, 9rem);
+            color: white;
+            text-shadow: 0 0 10px #ff3385, 0 0 30px #ff3385, 0 0 60px #ff3385;
+            margin: 6px 0;
+            font-weight: normal;
+            line-height: 1;
+        }
+
+        .handwriting-pink {
+            font-family: 'Dancing Script', cursive;
+            color: #ff3385;
+            font-size: clamp(1.5rem, 6vw, 3rem);
+            margin: 0 0 18px 0;
+            font-weight: 700;
+            text-shadow: 0 0 10px rgba(255,51,133,0.4);
+        }
+
+        .msg-text {
+            font-family: 'Satisfy', cursive;
+            font-size: clamp(1.1rem, 4.2vw, 1.7rem);
+            line-height: 1.9;
+            margin: 12px 0;
+            font-weight: normal;
+        }
+
+        .pink-highlight {
+            color: #ff3385;
+            font-family: 'Great Vibes', cursive;
+            font-size: 1.3em;
+            text-shadow: 0 0 8px rgba(255,51,133,0.5);
+        }
+
+        .divider {
+            font-family: 'Great Vibes', cursive;
+            font-size: clamp(1.4rem, 5vw, 2.2rem);
+            color: #ff3385;
+            opacity: 0.6;
+            margin: 8px 0;
+            letter-spacing: 8px;
+        }
+
+        .heart-particle {
+            position: absolute;
+            font-size: clamp(1rem, 3vw, 1.6rem);
+            animation: floatHeart 5s ease-in infinite;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        @keyframes floatHeart {
+            0%   { transform: translateY(105vh) scale(0.5); opacity: 0; }
+            15%  { opacity: 1; }
+            100% { transform: translateY(-10vh) scale(1.3); opacity: 0; }
+        }
+
+        @media (max-width: 420px) {
+            #final-message { width: 97%; }
+            .msg-text { line-height: 1.7; }
+            .divider { letter-spacing: 4px; }
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="matrix"></canvas>
+
+    <div id="text-container">
+        <span class="word-display" id="word-display"></span>
+    </div>
+
+    <div id="stars"></div>
+
+    <div id="final-message">
+        <h2 class="handwriting-gold">A Message From The Heart</h2>
+        <h1 class="glow-title">Oishy</h1>
+        <h3 class="handwriting-pink">Your Biral Er Baccha...</h3>
+        <div class="divider">~ ♡ ~</div>
+        <p class="msg-text">
+            I'm <span class="pink-highlight">Truly Sorry</span>, with every piece of my heart.<br>
+            You mean the entire world to me, and I never want to lose you.
+        </p>
+        <p class="msg-text" style="margin-top:16px;">
+            Please forgive me, <span class="pink-highlight">Oishy</span> —<br>
+            I love you more than words can ever say.
+        </p>
+        <div class="divider" style="margin-top:16px;">~ ♡ ~</div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('matrix');
+        const ctx = canvas.getContext('2d');
+
+        function resize() {
+            canvas.width  = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resize();
+        window.addEventListener('resize', resize);
+
+        const letters  = "010101010101Iloveyou01010101".split("");
+        const fontSize = 16;
+        let drops = [];
+
+        function initDrops() {
+            drops = Array(Math.floor(canvas.width / fontSize)).fill(1);
+        }
+        initDrops();
+        window.addEventListener('resize', initDrops);
+
+        function drawMatrix() {
+            ctx.fillStyle = "rgba(0,0,0,0.05)";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = "#ff3385";
+            ctx.font = fontSize + "px arial";
+            for (let i = 0; i < drops.length; i++) {
+                ctx.fillText(letters[Math.floor(Math.random() * letters.length)], i * fontSize, drops[i] * fontSize);
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+                drops[i]++;
+            }
+        }
+        setInterval(drawMatrix, 33);
+
+        const sequence = [
+            { text: "3",      type: "number" },
+            { text: "2",      type: "number" },
+            { text: "1",      type: "number" },
+            { text: "I'm",    type: "word"   },
+            { text: "Truly",  type: "word"   },
+            { text: "Sorry",  type: "word"   },
+            { text: "My",     type: "word"   },
+            { text: "Love",   type: "word"   },
+            { text: "Oishy",  type: "word"   },
+        ];
+
+        const textContainer = document.getElementById('text-container');
+        const wordDisplay   = document.getElementById('word-display');
+        let idx = 0;
+
+        function showNext() {
+            if (idx < sequence.length) {
+                const item = sequence[idx];
+                wordDisplay.textContent = item.text;
+                textContainer.className = (item.type === "number" ? "number-style" : "word-style") + " show";
+
+                setTimeout(() => {
+                    textContainer.classList.remove('show');
+                    idx++;
+                    setTimeout(showNext, 500);
+                }, 1100);
+
+            } else {
+                canvas.style.display = 'none';
+                textContainer.style.display = 'none';
+                document.getElementById('stars').style.display = 'block';
+
+                const finalMsg = document.getElementById('final-message');
+                finalMsg.style.display = 'block';
+                setTimeout(() => { finalMsg.style.opacity = 1; }, 100);
+                spawnHearts();
+            }
+        }
+
+        setTimeout(showNext, 1000);
+
+        function spawnHearts() {
+            const symbols = [];
+            setInterval(() => {
+                const h = document.createElement('div');
+                h.className = 'heart-particle';
+                h.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+                h.style.left = (Math.random() * 100) + 'vw';
+                h.style.color = `hsl(${330 + Math.random()*30},100%,${60 + Math.random()*20}%)`;
+                h.style.animationDuration = (3 + Math.random() * 3) + 's';
+                h.style.animationDelay    = (Math.random() * 0.8) + 's';
+                document.body.appendChild(h);
+                setTimeout(() => h.remove(), 7000);
+            }, 350);
+        }
+    </script>
+</body>
+</html>
